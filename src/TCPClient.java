@@ -15,8 +15,7 @@ class TCPClient {
 
 		DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
 
-		BufferedReader inFromServer =new BufferedReader(new InputStreamReader(
-				clientSocket.getInputStream()));
+		BufferedReader inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
 		while (true) {
 
