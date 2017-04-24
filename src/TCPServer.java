@@ -21,7 +21,7 @@ class TCPServer{
 	}
 }
 
-final class ChatRequest implements Runnable{
+final class ChatRequest implements Runnable {
 	Socket socket;
 
 	//Constructor
@@ -46,17 +46,13 @@ final class ChatRequest implements Runnable{
 		//connectionSocket.getInetAddress();
 
 		BufferedReader inFromClient = new BufferedReader (new InputStreamReader(socket.getInputStream()));
-
 		DataOutputStream outToClient = new DataOutputStream(socket.getOutputStream());
 
-		while (true)
-		{
+		while (true){
 			clientSentence = inFromClient.readLine();
-
 			System.out.println("RECEIVED FROM CLIENT: " + clientSentence);
 
 			capitalizedSentence = clientSentence.toUpperCase() + "\n"; 
-
 			outToClient.writeBytes(capitalizedSentence);
 		}
 
