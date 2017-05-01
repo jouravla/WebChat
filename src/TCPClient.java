@@ -15,15 +15,15 @@ class TCPClient {
 		BufferedReader inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
 		while (true) {
+			modifiedSentence = inFromServer.readLine();
+
+			System.out.println("RECEIVED FROM SERVER: " + modifiedSentence);
+			
 			System.out.println("Please enter the text that you want to send to the server \n");
 
 			sentence = inFromUser.readLine();
 
 			outToServer.writeBytes(sentence + "\n");
-
-			modifiedSentence = inFromServer.readLine();
-
-			System.out.println("RECEIVED FROM SERVER: " + modifiedSentence);
 		}
 	}
 }

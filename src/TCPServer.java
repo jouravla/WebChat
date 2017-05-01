@@ -1,66 +1,73 @@
-import java.io.*;
-import java.net.*;
+import java.io.*
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.HashSet;
 
-//Jake Update 
+public class TCPServer {
+    /**
+     * Stores the DataOutputStream for each client connected to the server
+     */
+	private static HashSet<DataOutputStream> outStreams = new HashSet<DataOutputStream>();
 
-class TCPServer{
+    public static void main(String[] args) throws Exception {
+        ServerSocket welcomeSocket = new ServerSocket(6789);
+        System.out.println("The chat server is running.");
 
-	public static void main(String argv[]) throws Exception {
-		ServerSocket welcomeSocket = new ServerSocket(6789);
+        while (true) {
+        	System.out.println("In loop");
+        	welcomeSocket.accept();
+            new Messenger(welcomeSocket.accept()).start();
+        }
+    }
 
-		System.out.println("Waiting for incoming connection Request...");
+    /**
+     * Creates a Messenger (new thread) for each individual connection
+     */
+    private static class Messenger extends Thread {
+        private String userName;
+        private Socket socket;
+        private DataOutputStream outToClient;
+        private BufferedReader buffIn;
 
-		while(true) {
-			// Listen for a TCP connection request.
-			// Construct an object to process the HTTP request message.
-			ChatRequest request = new ChatRequest(welcomeSocket.accept());
+        public Messenger(Socket welcomeSocket) {
+        	System.out.println("Setting Up Socket");
+            this.socket = welcomeSocket;
+        }
 
-			// Create a new thread to process the request.
-			Thread thread = new Thread(request);
-			// Start the thread.
-			thread.start();
-		}
-	}
-}
+        public void run() {
+            try {
+                // Create input and output streams for the socket.
+                buffIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        		outToClient = new DataOutputStream(socket.getOutputStream());	
 
-final class ChatRequest implements Runnable {
-	Socket socket;
+        		//Ask for a username!
+                while (true) {
+                    userName = buffIn.readLine();
 
-	//Constructor
-	public ChatRequest(Socket socket) throws Exception {
-		this.socket = socket;
-	}
+                	System.out.print("PrintName");
+                    outToClient.writeBytes("Enter Unsername: ");
+            		outToClient.writeBytes("CRLF");
 
-	// Implement the run() method of the Runnable interface.
-	public void run() {
-		try {
-			processRequest();
-		} catch (Exception e) {
-			System.out.println(e);
-			e.printStackTrace();
-		}
-	}
+                    userName = buffIn.readLine();
+                    break;
+                }
+                
+                outToClient.writeBytes("Nice Username!");
+                
+                //Add DataOutputStream to list
+                outStreams.add(outToClient);
 
-	private void processRequest() throws Exception {
-		String clientSentence;
-		String capitalizedSentence;
-
-		//connectionSocket.getInetAddress();
-
-		BufferedReader inFromClient = new BufferedReader (new InputStreamReader(socket.getInputStream()));
-		DataOutputStream outToClient = new DataOutputStream(socket.getOutputStream());
-
-		while (true){
-			clientSentence = inFromClient.readLine();
-			System.out.println("RECEIVED FROM CLIENT: " + clientSentence);
-
-			capitalizedSentence = clientSentence.toUpperCase() + "\n"; 
-			outToClient.writeBytes(capitalizedSentence);
-		}
-
-		// Close streams and socket.
-		//os.close();
-		//br.close();
-		//socket.close();
-	}
+                // Send messages to all clients!
+                while (true) {
+                    String clientSentence = buffIn.readLine();
+                    System.out.println("RECEIVED FROM: "+ userName + " " + clientSentence);
+                    for (DataOutputStream stream : outStreams) {
+                        stream.writeBytes(userName + ": " + clientSentence);
+                    }
+                }
+            } catch (IOException e) {
+                System.out.println(e);
+            } 
+        }
+    }
 }
