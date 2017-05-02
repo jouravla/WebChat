@@ -20,7 +20,7 @@ class TCPClient {
 			
 			//Enter Username
 			sentence = inFromUser.readLine();
-			outToServer.writeBytes(sentence);
+			outToServer.writeBytes(sentence + "\n");
 			
 			//Server Confirms Username
 			modifiedSentence = inFromServer.readLine();
@@ -29,5 +29,10 @@ class TCPClient {
 			//Server Says to Start Typing!
 			modifiedSentence = inFromServer.readLine();
 			System.out.println(modifiedSentence);
+			
+			while(true) {
+				modifiedSentence = inFromServer.readLine();
+				System.out.println(modifiedSentence);
+			}
 	}
 }

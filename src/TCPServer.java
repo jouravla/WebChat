@@ -1,8 +1,4 @@
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -53,19 +49,22 @@ public class TCPServer {
 
         		//Ask for a username!
                 outToClient.writeBytes("Enter Unsername: " + "\n");
+                
+                //Read in ssername
                 userName = buffIn.readLine();
                 System.out.println(userName);
                 
-                outToClient.writeBytes("Hello " + userName + " " + "Welcome to the ChatRoom!");
+                //Confirm
+                outToClient.writeBytes("Hello " + userName + " " + "Welcome to the ChatRoom!" + "\n");
                 
                 //Add DataOutputStream to list
                 outStreams.add(outToClient);
                 
-                outToClient.writeBytes("You can now chat to everyone here!");
+                outToClient.writeBytes("You can now chat to everyone here!" + "\n");
                 
                 //Notify everyone that someone joined the chatroom!
                 for (DataOutputStream stream : outStreams) {
-                    stream.writeBytes(userName + ": Has joined the chatroom!");
+                    stream.writeBytes(userName + ": Has joined the chatroom!" + "\n");
                 }
 
                 // Send messages to all clients!
