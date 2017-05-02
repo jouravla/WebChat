@@ -12,11 +12,10 @@ public class ChatGUI extends JFrame {
 	Panel mainPanel = new Panel();
 	Panel chatPanel = new Panel();
 	Panel entryPanel = new Panel();
+	
+	TCPClient client;
 
 	//~~~~~~~~Entry Panel Components~~~~~~~~~
-	private Label screenNameLabel = new Label("Name:");
-	private TextField screenName = new TextField("", 20);
-
 	private Label serverLabel = new Label("Server:"); 
 	private TextField server = new TextField("", 20);
 
@@ -41,8 +40,6 @@ public class ChatGUI extends JFrame {
 		//~~~~~~~~Entry Panel Components~~~~~~~~~
 		//GridLayout grid = new GridLayout(2,1);
 		//entryPanel.setLayout(grid);
-		entryPanel.add(screenNameLabel);
-		entryPanel.add(screenName);
 		entryPanel.add(serverLabel);
 		entryPanel.add(server);
 		entryPanel.add(portLabel);
@@ -74,21 +71,18 @@ public class ChatGUI extends JFrame {
 	// will attempt to join chat on click
 	class JoinListener implements ActionListener {
 		public void actionPerformed(ActionEvent event) {
-			if((server.getText()).equals("") || port.getText().equals("") || screenName.getText().equals("")) {
-				System.out.println("All fields must be filled out.");
-				return;
-			}
+//			if((server.getText()).equals("") || port.getText().equals("")) {
+//				System.out.println("All fields must be filled out.");
+//				return;
+//			}
 
 			entryPanel.setVisible(false);
 			chatPanel.setVisible(true);
-			//TCPClient client = new Client(sender.getText(), recipient.getText(), subject.getText(), message.getText());
-
-			//surrounded by a try catch in case specialized errors wanted to be implemented
-			//			try {
-			//				SMTP blah = new SMTP(email);
-			//			} catch (Exception error) {
-			//				System.out.println("Sending failed: " + error);
-			//			}
+			
+			try {
+				client = new TCPClient(server.getText(), port.getText());
+			} catch (Exception e) {}
+			System.out.println("Client created");
 		}
 	}
 
@@ -96,7 +90,10 @@ public class ChatGUI extends JFrame {
 	// will send a message on click
 	class SendListener implements ActionListener {
 		public void actionPerformed(ActionEvent event) {
-
+			try {
+				client.sendToServer(message.getText());
+			} catch (Exception e) {}
+			message.setText("");
 		}
 	}
 	static public void main(String argv[]) {

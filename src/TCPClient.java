@@ -1,18 +1,28 @@
 import java.io.*;
 import java.net.*;
 class TCPClient {
+	String server;
+	String port;
+	
+	BufferedReader inFromUser;
+	Socket clientSocket;
+	DataOutputStream outToServer;
+	BufferedReader inFromServer;
+	
+	String sentence;
+	String modifiedSentence;
+	
+	public TCPClient(String server, String port) throws Exception{
+		this.server = server;
+		this.port = port;
 
-	public static void main(String argv[]) throws Exception {
-		String sentence;
-		String modifiedSentence;
+		inFromUser = new BufferedReader(new InputStreamReader(System.in));
 
-		BufferedReader inFromUser = new BufferedReader(new InputStreamReader(System.in));
+		clientSocket = new Socket(Inet4Address.getLocalHost(), 6789);
 
-		Socket clientSocket = new Socket(Inet4Address.getLocalHost(), 6789);
+		outToServer = new DataOutputStream(clientSocket.getOutputStream());
 
-		DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
-
-		BufferedReader inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+		inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
 			//Server Asks for Username
 			modifiedSentence = inFromServer.readLine();	
@@ -34,5 +44,17 @@ class TCPClient {
 				modifiedSentence = inFromServer.readLine();
 				System.out.println(modifiedSentence);
 			}
+	}
+	
+	void sendToServer(String text) throws Exception{
+		outToServer.writeBytes(text + "\n");
+		listenFromServer();
+	}
+	
+	void listenFromServer() throws IOException{
+		while(true) {
+			modifiedSentence = inFromServer.readLine();
+			System.out.println(modifiedSentence);
+		}
 	}
 }

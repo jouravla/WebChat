@@ -15,7 +15,6 @@ public class TCPServer {
         System.out.println("The chat server is running.");
 
         while (true) {
-        	System.out.println("In loop");
             Messenger request = new Messenger(welcomeSocket.accept());
             
 			Thread thread = new Thread(request);
@@ -41,21 +40,18 @@ public class TCPServer {
         public void run() {
             try {
             	//Get a reference to the socket's input and output streams.
-        		InputStream is = socket.getInputStream(); 
+        		BufferedReader buffIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         		DataOutputStream outToClient = new DataOutputStream(socket.getOutputStream());
 
-        		//Set up input stream filters.
-        		BufferedReader buffIn = new BufferedReader(new InputStreamReader(is));
-
         		//Ask for a username!
-                outToClient.writeBytes("Enter Unsername: " + "\n");
+                outToClient.writeBytes("Enter Username: " + "\n");
                 
-                //Read in ssername
+                //Read in username
                 userName = buffIn.readLine();
                 System.out.println(userName);
                 
                 //Confirm
-                outToClient.writeBytes("Hello " + userName + " " + "Welcome to the ChatRoom!" + "\n");
+                outToClient.writeBytes("Hello " + userName + ". Welcome to the ChatRoom!\n");
                 
                 //Add DataOutputStream to list
                 outStreams.add(outToClient);
