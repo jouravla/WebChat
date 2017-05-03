@@ -1,6 +1,11 @@
 import java.io.*;
 import java.net.*;
 
+/**
+ * TCP Client
+ * 
+ * @author Sasha Jouravlev & Jake Beley
+ */
 class TCPClient {
 	String server;
 	int port;
@@ -27,20 +32,22 @@ class TCPClient {
 		clientSocket = new Socket(server, port);
 
 		outToServer = new DataOutputStream(clientSocket.getOutputStream());
-
 		inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
 		new ListenFromServer().start();
 	}
 
-	void sendToServer(String text) throws Exception{
-		outToServer.writeBytes(text + "\n");
+	// Sends the message to the server
+	void sendToServer(String msg) throws Exception{
+		outToServer.writeBytes(msg + "\n");
 	}
 
+	// Displays the text into the gui chat window
 	private void display(String msg) {
 		gui.append(msg + "\n");
 	}
 
+	// Class waits for a message from the server and prints it into the gui (via display)
 	class ListenFromServer extends Thread {
 		public void run() {
 			while(true) {

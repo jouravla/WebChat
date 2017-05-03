@@ -28,7 +28,7 @@ public class TCPServer {
 		private String userName;
 		private Socket socket;
 		private DataOutputStream outToClient;
-		private BufferedReader buffIn;
+		private BufferedReader inFromClient;
 
 		public Messenger(Socket welcomeSocket) {
 			System.out.println("Setting Up Socket");
@@ -38,15 +38,15 @@ public class TCPServer {
 		public void run() {
 			try {
 				// Get a reference to the socket's input and output streams.
-				buffIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+				inFromClient = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 				outToClient = new DataOutputStream(socket.getOutputStream());
 				
 				// Ask for a username!
-				outToClient.writeBytes("Please enter your username.");
+				outToClient.writeBytes("Please enter your username.\n");
 
 				// Read in username
-				userName = buffIn.readLine();
-				System.out.println(userName);
+				userName = inFromClient.readLine();
+				System.out.println(userName + " has connected.");
 
 				// Confirm
 				outToClient.writeBytes("Hello " + userName + ". Welcome to the ChatRoom!\n");
@@ -63,7 +63,7 @@ public class TCPServer {
 
 				// Send messages to all clients!
 				while (true) {
-					String clientSentence = buffIn.readLine();
+					String clientSentence = inFromClient.readLine();
 					System.out.println("RECEIVED FROM " + userName + ": " + clientSentence);
 					for (DataOutputStream stream : outStreams) {
 						stream.writeBytes(userName + ": " + clientSentence);

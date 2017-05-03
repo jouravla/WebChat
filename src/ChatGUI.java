@@ -2,11 +2,9 @@ import javax.swing.JFrame;
 import java.awt.*;
 import java.awt.event.*;
 
-
 /**
- * This is a simple GUI for the user to input their information
+ * This is a GUI
  * @author Sasha Jouravlev
- *
  */
 public class ChatGUI extends JFrame implements ActionListener{
 	Panel mainPanel = new Panel();
@@ -51,6 +49,7 @@ public class ChatGUI extends JFrame implements ActionListener{
 		chatPanel.add(chatLabel);
 		chatPanel.add(chat);
 		chatPanel.add(message);
+		message.addActionListener(this);
 		chatPanel.add(sendButton);
 		sendButton.addActionListener(this);
 
@@ -60,7 +59,7 @@ public class ChatGUI extends JFrame implements ActionListener{
 		mainPanel.add(chatPanel);
 		add(mainPanel);
 
-		chatPanel.setVisible(false);
+		chatPanel.setEnabled(false);
 		pack();
 		show();
 
@@ -76,8 +75,9 @@ public class ChatGUI extends JFrame implements ActionListener{
 				return;
 			}
 			
-			entryPanel.setVisible(false);
-			chatPanel.setVisible(true);
+			entryPanel.setEnabled(false);
+			chatPanel.setEnabled(true);
+			message.requestFocus();
 
 			try {
 				client = new TCPClient(server.getText(), Integer.parseInt(port.getText()), this);
@@ -88,12 +88,14 @@ public class ChatGUI extends JFrame implements ActionListener{
 			System.out.println("Client created");
 		}
 
-		if(obj == sendButton){
+		if(obj == sendButton || obj == message){
+			if(message.getText().equals("")){
+				return;
+			}
+			
 			try {
 				client.sendToServer(message.getText());
-			} catch (Exception e) {
-				System.out.println();
-			}
+			} catch (Exception e) {}
 
 			message.setText("");
 		}
