@@ -66,7 +66,7 @@ public class TCPServer {
 					String clientSentence = inFromClient.readLine();
 					System.out.println("RECEIVED FROM " + userName + ": " + clientSentence);
 					for (DataOutputStream stream : outStreams) {
-						stream.writeBytes(userName + ": " + clientSentence);
+						stream.writeBytes(userName + ": " + clientSentence + "\n");
 					}
 				}
 			} catch (IOException e) {

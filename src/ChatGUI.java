@@ -1,3 +1,4 @@
+import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import java.awt.*;
 import java.awt.event.*;
@@ -9,6 +10,8 @@ import java.awt.event.*;
 public class ChatGUI extends JFrame implements ActionListener{
 	Panel mainPanel = new Panel();
 	Panel chatPanel = new Panel();
+	Panel chatSubPanel1 = new Panel();
+	Panel chatSubPanel2 = new Panel();
 	Panel entryPanel = new Panel();
 
 	TCPClient client;
@@ -23,21 +26,17 @@ public class ChatGUI extends JFrame implements ActionListener{
 	private Button joinButton = new Button("Join");
 
 	//~~~~~~~Main Panel Components~~~~~~~~~
-	private Label chatLabel = new Label("Chat");
-	private TextArea chat = new TextArea();
+	private TextArea chat = new TextArea(10,67);
 
-	private TextField message = new TextField("",50);
+	private TextField message = new TextField("",60);
 
 	private Button sendButton = new Button("Send");
 
 	public ChatGUI() {
 		super("Java WebChat");
 
-		GridLayout grid = new GridLayout(2,1);
-		mainPanel.setLayout(grid);
+		mainPanel.setLayout(new BoxLayout(mainPanel,BoxLayout.Y_AXIS));
 		//~~~~~~~~Entry Panel Components~~~~~~~~~
-		//GridLayout grid = new GridLayout(2,1);
-		//entryPanel.setLayout(grid);
 		entryPanel.add(serverLabel);
 		entryPanel.add(server);
 		entryPanel.add(portLabel);
@@ -46,11 +45,14 @@ public class ChatGUI extends JFrame implements ActionListener{
 		joinButton.addActionListener(this);
 
 		//~~~~~~~Main Panel Components~~~~~~~~~
-		chatPanel.add(chatLabel);
-		chatPanel.add(chat);
-		chatPanel.add(message);
+		chatPanel.setLayout(new BoxLayout(chatPanel,BoxLayout.Y_AXIS));
+		chatSubPanel1.add(chat);
+		chatSubPanel2.add(message);
+		chatSubPanel2.add(sendButton);
+		chatPanel.add(chatSubPanel1);
+		chatPanel.add(chatSubPanel2);
+
 		message.addActionListener(this);
-		chatPanel.add(sendButton);
 		sendButton.addActionListener(this);
 
 		chat.setEditable(false);
@@ -74,7 +76,7 @@ public class ChatGUI extends JFrame implements ActionListener{
 				System.out.println("All fields must be filled out.");
 				return;
 			}
-			
+
 			entryPanel.setEnabled(false);
 			chatPanel.setEnabled(true);
 			message.requestFocus();
@@ -83,7 +85,7 @@ public class ChatGUI extends JFrame implements ActionListener{
 				client = new TCPClient(server.getText(), Integer.parseInt(port.getText()), this);
 				client.start();
 			} catch (Exception e) {
-				
+
 			}
 			System.out.println("Client created");
 		}
@@ -92,7 +94,7 @@ public class ChatGUI extends JFrame implements ActionListener{
 			if(message.getText().equals("")){
 				return;
 			}
-			
+
 			try {
 				client.sendToServer(message.getText());
 			} catch (Exception e) {}
