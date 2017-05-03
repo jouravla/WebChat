@@ -42,7 +42,7 @@ public class TCPServer {
 				outToClient = new DataOutputStream(socket.getOutputStream());
 				
 				// Ask for a username!
-				outToClient.writeBytes("Enter Username: " + "\n");
+				outToClient.writeBytes("Please enter your username.");
 
 				// Read in username
 				userName = buffIn.readLine();
@@ -64,7 +64,7 @@ public class TCPServer {
 				// Send messages to all clients!
 				while (true) {
 					String clientSentence = buffIn.readLine();
-					System.out.println("RECEIVED FROM: " + userName + " " + clientSentence);
+					System.out.println("RECEIVED FROM " + userName + ": " + clientSentence);
 					for (DataOutputStream stream : outStreams) {
 						stream.writeBytes(userName + ": " + clientSentence);
 					}
@@ -85,8 +85,7 @@ public class TCPServer {
 					e1.printStackTrace();
 				}
 
-				// Notify the current active users that someone left the
-				// chatroom!
+				// Notify the current active users that someone left the chatroom!
 				for (DataOutputStream stream : outStreams) {
 					try {
 						if (stream != null) {

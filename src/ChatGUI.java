@@ -8,19 +8,19 @@ import java.awt.event.*;
  * @author Sasha Jouravlev
  *
  */
-public class ChatGUI extends JFrame {
+public class ChatGUI extends JFrame implements ActionListener{
 	Panel mainPanel = new Panel();
 	Panel chatPanel = new Panel();
 	Panel entryPanel = new Panel();
-	
+
 	TCPClient client;
 
 	//~~~~~~~~Entry Panel Components~~~~~~~~~
 	private Label serverLabel = new Label("Server:"); 
-	private TextField server = new TextField("", 20);
+	private TextField server = new TextField("localhost", 20);
 
 	private Label portLabel = new Label("Port:");
-	private TextField port = new TextField("", 20);
+	private TextField port = new TextField("6789", 20);
 
 	private Button joinButton = new Button("Join");
 
@@ -33,7 +33,7 @@ public class ChatGUI extends JFrame {
 	private Button sendButton = new Button("Send");
 
 	public ChatGUI() {
-		super("Java Mailclient");
+		super("Java WebChat");
 
 		GridLayout grid = new GridLayout(2,1);
 		mainPanel.setLayout(grid);
@@ -45,16 +45,16 @@ public class ChatGUI extends JFrame {
 		entryPanel.add(portLabel);
 		entryPanel.add(port);
 		entryPanel.add(joinButton);
-
-		joinButton.addActionListener(new JoinListener());
+		joinButton.addActionListener(this);
 
 		//~~~~~~~Main Panel Components~~~~~~~~~
 		chatPanel.add(chatLabel);
 		chatPanel.add(chat);
 		chatPanel.add(message);
 		chatPanel.add(sendButton);
+		sendButton.addActionListener(this);
 
-		chat.setEnabled(false);
+		chat.setEditable(false);
 
 		mainPanel.add(entryPanel);
 		mainPanel.add(chatPanel);
@@ -67,35 +67,43 @@ public class ChatGUI extends JFrame {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 
-	//the listener for the join click
-	// will attempt to join chat on click
-	class JoinListener implements ActionListener {
-		public void actionPerformed(ActionEvent event) {
-//			if((server.getText()).equals("") || port.getText().equals("")) {
-//				System.out.println("All fields must be filled out.");
-//				return;
-//			}
+	public void actionPerformed(ActionEvent event) {
+		Object obj = event.getSource();
 
+		if(obj == joinButton){
+			if((server.getText()).equals("") || port.getText().equals("")) {
+				System.out.println("All fields must be filled out.");
+				return;
+			}
+			
 			entryPanel.setVisible(false);
 			chatPanel.setVisible(true);
-			
+
 			try {
-				client = new TCPClient(server.getText(), port.getText());
-			} catch (Exception e) {}
+				client = new TCPClient(server.getText(), Integer.parseInt(port.getText()), this);
+				client.start();
+			} catch (Exception e) {
+				
+			}
 			System.out.println("Client created");
 		}
-	}
 
-	//the listener for the send click
-	// will send a message on click
-	class SendListener implements ActionListener {
-		public void actionPerformed(ActionEvent event) {
+		if(obj == sendButton){
 			try {
 				client.sendToServer(message.getText());
-			} catch (Exception e) {}
+			} catch (Exception e) {
+				System.out.println();
+			}
+
 			message.setText("");
 		}
 	}
+
+	void append(String str) {
+		chat.append(str);
+		chat.setCaretPosition(chat.getText().length() - 1);
+	}
+
 	static public void main(String argv[]) {
 		new ChatGUI();
 	}
