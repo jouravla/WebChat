@@ -2,7 +2,7 @@ import java.io.*;
 import java.net.*;
 
 /**
- * TCP Client
+ * TCP Client for WebChat
  * 
  * @author Sasha Jouravlev & Jake Beley
  */
@@ -20,34 +20,43 @@ class TCPClient {
 
 	ChatGUI gui;
 
+	//Constructor
 	public TCPClient(String server, int port, ChatGUI gui) throws Exception{
 		this.server = server;
 		this.port = port;
 		this.gui = gui;
 	}
 
-	public void start() throws Exception{
-		inFromUser = new BufferedReader(new InputStreamReader(System.in));
+	//Method that is executed upon creation of a Client from the GUI
+	public boolean start(){
+		try{
+			inFromUser = new BufferedReader(new InputStreamReader(System.in));
 
-		clientSocket = new Socket(server, port);
+			clientSocket = new Socket(server, port);
 
-		outToServer = new DataOutputStream(clientSocket.getOutputStream());
-		inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+			outToServer = new DataOutputStream(clientSocket.getOutputStream());
+			inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
-		new ListenFromServer().start();
+			new ListenFromServer().start();
+			return true;
+		}
+		catch(Exception e){
+			return false;
+		}
+
 	}
 
-	// Sends the message to the server
+	//Sends the message to the server
 	void sendToServer(String msg) throws Exception{
 		outToServer.writeBytes(msg + "\n");
 	}
 
-	// Displays the text into the gui chat window
+	//Displays the text into the CUI chat
 	private void display(String msg) {
 		gui.append(msg + "\n");
 	}
 
-	// Class waits for a message from the server and prints it into the gui (via display)
+	//Class waits for a message from the server and prints it into the CUI (via display)
 	class ListenFromServer extends Thread {
 		public void run() {
 			while(true) {

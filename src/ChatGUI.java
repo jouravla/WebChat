@@ -4,8 +4,10 @@ import java.awt.*;
 import java.awt.event.*;
 
 /**
- * This is a GUI
- * @author Sasha Jouravlev
+ * This is a simple GUI for WebChat. It consists of a server/port entry field, a chat window, and a 
+ * message line.
+ * 
+ * @author Sasha Jouravlev & Jake Beley
  */
 public class ChatGUI extends JFrame implements ActionListener{
 	Panel mainPanel = new Panel();
@@ -27,14 +29,13 @@ public class ChatGUI extends JFrame implements ActionListener{
 
 	//~~~~~~~Main Panel Components~~~~~~~~~
 	private TextArea chat = new TextArea(10,67);
-
 	private TextField message = new TextField("",60);
-
 	private Button sendButton = new Button("Send");
 
+	//Constructor
 	public ChatGUI() {
-		super("Java WebChat");
-
+		super("WebChat");
+		
 		mainPanel.setLayout(new BoxLayout(mainPanel,BoxLayout.Y_AXIS));
 		//~~~~~~~~Entry Panel Components~~~~~~~~~
 		entryPanel.add(serverLabel);
@@ -42,7 +43,6 @@ public class ChatGUI extends JFrame implements ActionListener{
 		entryPanel.add(portLabel);
 		entryPanel.add(port);
 		entryPanel.add(joinButton);
-		joinButton.addActionListener(this);
 
 		//~~~~~~~Main Panel Components~~~~~~~~~
 		chatPanel.setLayout(new BoxLayout(chatPanel,BoxLayout.Y_AXIS));
@@ -52,57 +52,74 @@ public class ChatGUI extends JFrame implements ActionListener{
 		chatPanel.add(chatSubPanel1);
 		chatPanel.add(chatSubPanel2);
 
+		//~~~~~~~Action Listeners~~~~~~~
+		joinButton.addActionListener(this);
 		message.addActionListener(this);
 		sendButton.addActionListener(this);
 
-		chat.setEditable(false);
+		chat.setEditable(false);		
+		chatPanel.setEnabled(false);
 
 		mainPanel.add(entryPanel);
 		mainPanel.add(chatPanel);
 		add(mainPanel);
 
-		chatPanel.setEnabled(false);
 		pack();
 		show();
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 
+	//Action listeners for the Send and Join functionalities 
 	public void actionPerformed(ActionEvent event) {
 		Object obj = event.getSource();
 
+		//Join Action
 		if(obj == joinButton){
+			//In case of missing connection information
 			if((server.getText()).equals("") || port.getText().equals("")) {
-				System.out.println("All fields must be filled out.");
+				chat.setText("Server and Port fields must be filled out.");
 				return;
 			}
 
+			//Create a client
+			try {
+				client = new TCPClient(server.getText(), Integer.parseInt(port.getText()), this);
+				if(!client.start()){
+					chat.setText("Failed to establish server connection.");
+					return;
+				}
+				System.out.println("Client created");
+			} catch (Exception e) {
+				chat.setText("Failed to establish client connection.");
+				return;
+			}
+
+			//Reset chat, enable bottom, disable top
+			chat.setText("");
 			entryPanel.setEnabled(false);
 			chatPanel.setEnabled(true);
 			message.requestFocus();
-
-			try {
-				client = new TCPClient(server.getText(), Integer.parseInt(port.getText()), this);
-				client.start();
-			} catch (Exception e) {
-
-			}
-			System.out.println("Client created");
 		}
 
+		//Send Action
 		if(obj == sendButton || obj == message){
+			//Don't send if text is empty
 			if(message.getText().equals("")){
 				return;
 			}
 
+			//Send message to server
 			try {
 				client.sendToServer(message.getText());
-			} catch (Exception e) {}
-
-			message.setText("");
+				message.setText("");
+			} catch (Exception e) {
+				chat.append("Failed to send message.");
+			}	
 		}
 	}
 
+	//Append method utilized by the client
 	void append(String str) {
 		chat.append(str);
 		chat.setCaretPosition(chat.getText().length() - 1);
