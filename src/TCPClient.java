@@ -51,12 +51,12 @@ class TCPClient {
 		outToServer.writeBytes(msg + "\n");
 	}
 
-	//Displays the text into the CUI chat
+	//Displays the text into the GUI chat
 	private void display(String msg) {
 		gui.append(msg + "\n");
 	}
 
-	//Class waits for a message from the server and prints it into the CUI (via display)
+	//Class waits for a message from the server and prints it into the GUI (via display)
 	class ListenFromServer extends Thread {
 		public void run() {
 			while(true) {
