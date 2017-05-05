@@ -20,10 +20,10 @@ public class ChatGUI extends JFrame implements ActionListener{
 
 	//~~~~~~~~Entry Panel Components~~~~~~~~~
 	private Label serverLabel = new Label("Server:"); 
-	private TextField server = new TextField("localhost", 20);
+	private TextField server = new TextField("", 20);
 
 	private Label portLabel = new Label("Port:");
-	private TextField port = new TextField("6789", 20);
+	private TextField port = new TextField("", 20);
 
 	private Button joinButton = new Button("Join");
 
